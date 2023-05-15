@@ -38,7 +38,7 @@ impl HotReloadLibrary {
         }
 
         let hrl_path = path.with_extension(HRL_EXT_A);
-        fs::copy(path, &hrl_path).map_err(|e| Error::IoFailure(e))?;
+        fs::copy(path, &hrl_path).map_err(|e| Error::IoError(e))?;
 
         let lib = unsafe { Library::new(&hrl_path) }.map_err(|e| Error::LoadLibraryError(e))?;
 
@@ -59,14 +59,7 @@ impl HotReloadLibrary {
 
     pub fn reload(&mut self) -> Result<()> {
         let mut events = self.watcher.try_iter();
-        let need_reload = events.any(|res| {
-            if let Ok(event) = res {
-                event.kind.is_create()
-            } else {
-                false
-            }
-        });
-        events.for_each(drop);
+        let need_reload = events.any(|res| res.map_or(false, |event| event.kind.is_create()));
 
         if need_reload {
             self.force_reload()
@@ -84,10 +77,13 @@ impl HotReloadLibrary {
         );
 
         if let Err(e) = fs::copy(&self.watch_path, &new_hrl_path) {
-            Err(Error::IoFailure(e))
+            Err(Error::IoError(e))
         } else {
             match unsafe { Library::new(&new_hrl_path) } {
                 Ok(new_lib) => {
+                    // drop remaining events after successful reload
+                    self.watcher.try_iter().for_each(drop);
+
                     self.lib = Some(new_lib);
                     self.loaded_path = new_hrl_path;
 

@@ -17,7 +17,7 @@ fn remove_hrl_files(path: &Path) -> Result<()> {
 
 fn remove_file(path: &Path) -> Result<()> {
     if path.exists() {
-        fs::remove_file(path).map_err(|e| Error::IoFailure(e))
+        fs::remove_file(path).map_err(|e| Error::IoError(e))
     } else {
         Ok(())
     }

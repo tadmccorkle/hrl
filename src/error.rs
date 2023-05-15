@@ -11,7 +11,7 @@ pub type Result<T> = StdResult<T, Error>;
 pub enum Error {
     PathNotFound,
     LibraryUnloaded,
-    IoFailure(io::Error),
+    IoError(io::Error),
     LoadLibraryError(libloading::Error),
     LoadSymbolError(libloading::Error),
     FileWatcherError(notify::Error),
@@ -23,7 +23,7 @@ impl Display for Error {
         match self {
             PathNotFound => write!(f, "Path could not be found."),
             LibraryUnloaded => write!(f, "Library has been unloaded and cannot be used."),
-            IoFailure(e) => write!(f, "File system IO error.").and(Display::fmt(e, f)),
+            IoError(e) => write!(f, "File system IO error.").and(Display::fmt(e, f)),
             LoadLibraryError(e) => write!(f, "Could not load library.").and(Display::fmt(e, f)),
             LoadSymbolError(e) => write!(f, "Could not load symbol.").and(Display::fmt(e, f)),
             FileWatcherError(e) => write!(f, "File watcher error.").and(Display::fmt(e, f)),

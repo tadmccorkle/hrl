@@ -25,7 +25,7 @@ impl AutoHotReloadLibrary {
         }
 
         let hrl_path = path.with_extension(HRL_EXT_A);
-        fs::copy(path, &hrl_path).map_err(|e| Error::IoFailure(e))?;
+        fs::copy(path, &hrl_path).map_err(|e| Error::IoError(e))?;
 
         let lib = Arc::new(RwLock::new(Some(
             unsafe { Library::new(&hrl_path) }.map_err(|e| Error::LoadLibraryError(e))?,

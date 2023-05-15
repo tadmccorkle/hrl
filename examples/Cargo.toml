@@ -1,0 +1,13 @@
+[workspace]
+members = ["auto_hot_reload_lib", "manual_hot_reload_lib"]
+
+[package]
+name = "hot_reload_examples"
+version = "0.0.0"
+edition = "2021"
+publish = false
+
+[lib]
+name = "example_lib"
+path = "lib.rs"
+crate-type = ["lib", "cdylib"]
